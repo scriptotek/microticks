@@ -1,6 +1,20 @@
 # Microticks
 
-Microservice for collecting analytics data in a SQLite database.
+Microservice for collecting simple analytics data (sessions and session events)
+in a SQLite database.
+
+### Usage
+
+```
+POST /sessions
+    Start a new session and get a session token.
+
+POST /sessions/stop
+    Stop a session.
+
+POST /events
+    Store a new event.
+```
 
 ### Setup
 
@@ -21,6 +35,18 @@ $ flask run
 
 ### Production
 
-Setup Apache to use `microticks.wsgi`.
+Optional config:
 
-See http://flask.pocoo.org/docs/0.12/deploying/mod_wsgi/
+```
+export FLASK_LOG_LEVEL=INFO
+
+# Log errors to Sentry
+export MICROTICKS_SENTRY_DSN=...
+
+# Require an api key for every request
+export MICROTICKS_KEY=my-secret-key
+```
+
+```
+gunicorn --workers 2 --bind 127.0.0.1:8001 wsgi
+```

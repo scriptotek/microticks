@@ -7,9 +7,11 @@ setup(
     install_requires=[
         'pyyaml',
         'flask',
-        'Flask-JSON',
+        'flask-json',
         'flask-cors',
+        'flask-log',
         'raven',
-        'raven[flask]'
+        'raven[flask]',
+        'gunicorn'
     ],
 )
