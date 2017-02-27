@@ -8,6 +8,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 import yaml
+import click
 from flask import Flask, g, request, redirect, url_for
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 from flask_cors import CORS, cross_origin
@@ -69,6 +70,20 @@ def initdb_command():
     """Initializes the database."""
     get_db().init()
     app.logger.info('Initialized the database.')
+
+
+@app.cli.command('createconsumer')
+@click.option('--ip_filter', help='IP filter')
+@click.argument('name')
+def createconsumer_command(name, ip_filter):
+    """Create a new consumer key."""
+    key = get_db().consumers.create(name)
+    print('Created new consumer "%s"' % (name,))
+    print('Consumer key: %s' % (key,))
+
+
+def validate_consumer_key():
+    return get_db().consumers.validate(request.form.get('consumer_key'))
 
 
 @app.before_first_request
@@ -153,7 +168,7 @@ def hello():
 def start_session():
     consumer_id = validate_consumer_key()
     require_fields(['ts'])
-    token = get_db().sessions.start(request.remote_addr, request.form.get('ts'))
+    token = get_db().sessions.start(request.remote_addr, request.form.get('ts'), consumer_id)
     return json_response(token=token)
 
 
@@ -177,6 +192,7 @@ def store_event():
 
 @app.route('/events', methods=['GET'])
 def get_events():
+    validate_consumer_key()
     events = get_db().events.get()
     return json_response(events=events)
 

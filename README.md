@@ -26,10 +26,14 @@ $ pip install --editable .
 
 ### Run dev server
 
+Define the environment variables, initialize the database, then create a
+consumer key for your frontend app:
+
 ```
 $ export FLASK_APP=microticks
 $ export FLASK_DEBUG=true
 $ flask initdb
+$ flask createconsumer MyApp
 $ flask run
 ```
 

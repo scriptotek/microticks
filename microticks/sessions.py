@@ -41,13 +41,13 @@ class Sessions(object):
         c = self.db.update('UPDATE `sessions` SET stopped_at=? WHERE id=?',
                            (timestamp, session['id'],))
 
-    def start(self, ip, timestamp):
+    def start(self, ip, timestamp, consumer_id):
         """
         Start a new session and return the session token
         """
         token = uuid.uuid4().hex
-        c = self.db.update('INSERT INTO `sessions` (started_at, token, ip) VALUES (?, ?, ?)',
-                           (timestamp, token, ip))
+        c = self.db.update('INSERT INTO `sessions` (started_at, token, ip, consumer_id) VALUES (?, ?, ?, ?)',
+                           (timestamp, token, ip, consumer_id))
         if c.rowcount == 0:
             raise JsonError(description='Could not store new session in DB')
         return token

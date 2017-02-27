@@ -18,27 +18,27 @@ class Events(object):
               `session_id` INTEGER NOT NULL,
               `time`  TEXT NOT NULL,
               `action` TEXT NOT NULL,
-              `extras` TEXT
+              `data` TEXT
             );
         ''')
         self.logger.info('Table created: events')
 
-    def store(self, session, action, category, extras):
+    def store(self, session, action, data, timestamp):
         """
         Store a new event and return the event id
 
         Args:
             session (sqlite3.Row)
             action (string)
-            category (string)
-            extras (string)
+            data (string)
+            timestamp (string)
 
         Returns:
             The ID of the created event
         """
 
-        c = self.db.update('INSERT INTO `events` (session_id, time, action, category, extras) VALUES (?, ?, ?, ?, ?)',
-                           (session['id'], datetime.now().strftime('%F %T'), action, category, extras))
+        c = self.db.update('INSERT INTO `events` (session_id, time, action, data) VALUES (?, ?, ?, ?)',
+                           (session['id'], timestamp, action, data))
 
         return c.lastrowid
 

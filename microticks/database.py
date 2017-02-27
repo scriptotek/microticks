@@ -1,5 +1,6 @@
 import sqlite3
 
+from .consumers import Consumers
 from .events import Events
 from .sessions import Sessions
 
@@ -7,11 +8,13 @@ class Database(object):
 
     def __init__(self, filename):
         self.filename = filename
+        self.consumers = Consumers(self)
         self.events = Events(self)
         self.sessions = Sessions(self)
         self.open()
 
     def init(self):
+        self.consumers.init()
         self.events.init()
         self.sessions.init()
 
