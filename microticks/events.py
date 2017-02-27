@@ -18,7 +18,6 @@ class Events(object):
               `session_id` INTEGER NOT NULL,
               `time`  TEXT NOT NULL,
               `action` TEXT NOT NULL,
-              `category` TEXT,
               `extras` TEXT
             );
         ''')

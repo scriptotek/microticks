@@ -20,12 +20,13 @@ class Sessions(object):
               `token`  TEXT NOT NULL,
               `ip`  TEXT NOT NULL,
               `started_at`  TEXT NOT NULL,
-              `stopped_at`  TEXT
+              `stopped_at`  TEXT,
+              `consumer_id`  INTEGER NOT NULL
             );
         ''')
         self.logger.info('Table created: sessions')
 
-    def stop(self, token):
+    def stop(self, token, timestamp):
         """
         Stop a session.
 
@@ -38,15 +39,15 @@ class Sessions(object):
         session = self.get(token)
 
         c = self.db.update('UPDATE `sessions` SET stopped_at=? WHERE id=?',
-                           (datetime.now().strftime('%F %T'), session['id'],))
+                           (timestamp, session['id'],))
 
-    def start(self, ip):
+    def start(self, ip, timestamp):
         """
         Start a new session and return the session token
         """
         token = uuid.uuid4().hex
         c = self.db.update('INSERT INTO `sessions` (started_at, token, ip) VALUES (?, ?, ?)',
-                           (datetime.now().strftime('%F %T'), token, ip))
+                           (timestamp, token, ip))
         if c.rowcount == 0:
             raise JsonError(description='Could not store new session in DB')
         return token

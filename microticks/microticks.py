@@ -84,6 +84,12 @@ def startup():
     get_db().cleanup()
     app.logger.info('DB cleanup done')
 
+
+def require_fields(fields):
+    for fieldname in fields:
+        if request.form.get(fieldname) is None:
+            raise JsonError(error='No "%s" parameter provided' % (fieldname,), status=400)
+
 # -----------------------------------------------------------------------------
 # API key middleware
 
@@ -111,6 +117,10 @@ def hello():
     POST /sessions
         Start a new session and get a session token.
 
+        Form data:
+            consumer_key: string
+            ts: timestamp (2017-02-27T16:18:57.657Z)
+
         Returns:
             {'status': 200, 'token': string}
 
@@ -119,6 +129,7 @@ def hello():
 
         Form data:
             token: string
+            ts: timestamp (2017-02-27T16:18:57.657Z)
 
         Returns:
             {'status': 200}
@@ -129,9 +140,9 @@ def hello():
 
         Form data:
             token: the session token
+            ts: timestamp (2017-02-27T16:18:57.657Z)
             action: e.g. 'click_book',
-            category: '???'
-            extras: '???'
+            data: 'book id or something else'
 
         Returns:
             {'status': 200, 'event_id': int}
@@ -139,30 +150,29 @@ def hello():
 
 
 @app.route('/sessions', methods=['POST'])
-@api_key_required
 def start_session():
-    token = get_db().sessions.start(request.remote_addr)
+    consumer_id = validate_consumer_key()
+    require_fields(['ts'])
+    token = get_db().sessions.start(request.remote_addr, request.form.get('ts'))
     return json_response(token=token)
 
 
 @app.route('/sessions/stop', methods=['POST'])
-@api_key_required
 def stop_session():
-    token = request.form.get('token')
-    status = get_db().sessions.stop(token)
+    require_fields(['ts', 'token'])
+    status = get_db().sessions.stop(request.form.get('token'), request.form.get('ts'))
 
     return json_response()
 
 
 @app.route('/events', methods=['POST'])
-@api_key_required
 def store_event():
-    token = request.form.get('token')
-    action = request.form.get('action')
-    category = request.form.get('category')
-    extras = request.form.get('extras')
+    require_fields(['token', 'action', 'data', 'ts'])
     db = get_db()
-    event_id = db.events.store(db.sessions.get(token), action, category, extras)
+    event_id = db.events.store(db.sessions.get(request.form.get('token')),
+                               request.form.get('action'),
+                               request.form.get('data'),
+                               request.form.get('ts'))
     return json_response(event_id=event_id)
 
 @app.route('/events', methods=['GET'])
