@@ -45,7 +45,7 @@ class Events(object):
     def get(self):
         events = []
         for row in self.db.select('SELECT * FROM `events`'):
-            events.append(row)
+            events.append(dict(zip(row.keys(), row)))
 
         return events
 
