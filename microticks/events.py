@@ -1,5 +1,9 @@
 from datetime import datetime
 import logging
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 
 class Events(object):

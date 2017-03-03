@@ -12,6 +12,7 @@ setup(
         'flask-log',
         'raven',
         'raven[flask]',
-        'gunicorn'
+        'gunicorn',
+        'ujson'
     ],
 )
