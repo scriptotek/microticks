@@ -62,6 +62,18 @@ class Sessions(object):
 
         return sessions[0]
 
+    def find(self, args):
+        sessions = []
+        for row in self.db.select('''
+                SELECT sessions.id, sessions.started_at, sessions.stopped_at, COUNT(click_events.id) AS clicks
+                FROM sessions
+                JOIN events as click_events ON sessions.id=click_events.session_id AND click_events.action="click"
+                GROUP BY sessions.id
+            '''):
+            sessions.append(dict(zip(row.keys(), row)))
+
+        return sessions
+
     def cleanup(self):
         """
         Delete dangling sessions

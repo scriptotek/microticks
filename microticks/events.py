@@ -46,9 +46,9 @@ class Events(object):
 
         return c.lastrowid
 
-    def get(self):
+    def find(self):
         events = []
-        for row in self.db.select('SELECT * FROM `events`'):
+        for row in self.db.select('SELECT id, session_id, time, action, data FROM `events`'):
             row = dict(zip(row.keys(), row))
             try:
                 row['data'] = json.loads(row['data'])
