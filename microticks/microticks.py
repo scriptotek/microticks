@@ -192,7 +192,7 @@ def store_event():
 
 @app.route('/events', methods=['GET'])
 def get_events():
-    validate_consumer_key()
+    # validate_consumer_key()
     events = get_db().events.get()
     return json_response(events=events)
 
