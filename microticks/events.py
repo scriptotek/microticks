@@ -49,7 +49,12 @@ class Events(object):
     def get(self):
         events = []
         for row in self.db.select('SELECT * FROM `events`'):
-            events.append(dict(zip(row.keys(), row)))
+            row = dict(zip(row.keys(), row))
+            try:
+                row['data'] = json.loads(row['data'])
+            except ValueError:
+                pass
+            events.append(row)
 
         return events
 
