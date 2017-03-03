@@ -96,8 +96,8 @@ def startup():
     app.logger.addHandler(handler)
 
     app.logger.info('Instance path: %s', app.instance_path)
-    get_db().cleanup()
-    app.logger.info('DB cleanup done')
+    # get_db().cleanup()
+    # app.logger.info('DB cleanup done')
 
 
 def require_fields(fields):
@@ -180,6 +180,13 @@ def stop_session():
     return json_response()
 
 
+@app.route('/sessions', methods=['GET'])
+def get_sessions():
+    # validate_consumer_key()
+    sessions = get_db().sessions.find(request.form)
+    return json_response(sessions=sessions)
+
+
 @app.route('/events', methods=['POST'])
 def store_event():
     require_fields(['token', 'action', 'data', 'ts'])
@@ -192,7 +199,7 @@ def store_event():
 
 @app.route('/events', methods=['GET'])
 def get_events():
-    validate_consumer_key()
-    events = get_db().events.get()
+    # validate_consumer_key()
+    events = get_db().events.find()
     return json_response(events=events)
 

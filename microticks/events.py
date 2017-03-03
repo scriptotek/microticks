@@ -42,9 +42,9 @@ class Events(object):
 
         return c.lastrowid
 
-    def get(self):
+    def find(self):
         events = []
-        for row in self.db.select('SELECT * FROM `events`'):
+        for row in self.db.select('SELECT id, session_id, time, action, data FROM `events`'):
             events.append(dict(zip(row.keys(), row)))
 
         return events
