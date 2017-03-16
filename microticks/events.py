@@ -46,9 +46,16 @@ class Events(object):
 
         return c.lastrowid
 
-    def find(self):
+    def find(self, args):
         events = []
-        for row in self.db.select('SELECT id, session_id, time, action, data FROM `events`'):
+        filters = ['sessions.ip = "129.240.239.173"']
+        if args.get('date'):
+            filters.append('sessions.started_at LIKE "{}%"'.format(args.get('date')))
+        for row in self.db.select('''
+            SELECT events.id, events.session_id, events.time, events.action, events.data FROM events
+            LEFT JOIN sessions on sessions.id = events.session_id
+            WHERE {filters}
+            '''.format(filters=' AND '.join(filters))):
             row = dict(zip(row.keys(), row))
             try:
                 row['data'] = json.loads(row['data'])

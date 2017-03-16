@@ -161,6 +161,14 @@ def hello():
 
         Returns:
             {'status': 200, 'event_id': int}
+
+    GET /sessions?date=2017-03-16
+
+        Get sessions, optionally filtered by date.
+
+    GET /events?date=2017-03-16
+
+        Get events, optionally filtered by date.
     '''
 
 
@@ -183,8 +191,8 @@ def stop_session():
 @app.route('/sessions', methods=['GET'])
 def get_sessions():
     # validate_consumer_key()
-    sessions = get_db().sessions.find(request.form)
-    return json_response(sessions=sessions)
+    sessions = get_db().sessions.find(request.args)
+    return json_response(sessions=sessions, count=len(sessions))
 
 
 @app.route('/events', methods=['POST'])
@@ -200,6 +208,6 @@ def store_event():
 @app.route('/events', methods=['GET'])
 def get_events():
     # validate_consumer_key()
-    events = get_db().events.find()
-    return json_response(events=events)
+    events = get_db().events.find(request.args)
+    return json_response(events=events, count=len(events))
 

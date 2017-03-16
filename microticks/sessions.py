@@ -64,13 +64,18 @@ class Sessions(object):
 
     def find(self, args):
         sessions = []
+        filters = ['sessions.ip = "129.240.239.173"']
+        if args.get('date'):
+            filters.append('sessions.started_at LIKE "{}%"'.format(args.get('date')))
         for row in self.db.select('''
                 SELECT sessions.id, sessions.started_at, sessions.stopped_at, COUNT(click_events.id) AS clicks
                 FROM sessions
                 JOIN events as click_events ON sessions.id=click_events.session_id AND click_events.action="click"
+                WHERE {filters}
                 GROUP BY sessions.id
-            '''):
-            sessions.append(dict(zip(row.keys(), row)))
+            '''.format(filters=' AND '.join(filters))):
+            session = dict(zip(row.keys(), row))
+            sessions.append(session)
 
         return sessions
 
