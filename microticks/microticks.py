@@ -162,13 +162,13 @@ def hello():
         Returns:
             {'status': 200, 'event_id': int}
 
-    GET /sessions?date=2017-03-16
+    GET /sessions?ip=129.240.239.173&date=2017-03-16
 
-        Get sessions, optionally filtered by date.
+        Get sessions, optionally filtered by date and IP.
 
-    GET /events?date=2017-03-16
+    GET /events?ip=129.240.239.173&date=2017-03-16
 
-        Get events, optionally filtered by date.
+        Get events, optionally filtered by date and IP.
     '''
 
 

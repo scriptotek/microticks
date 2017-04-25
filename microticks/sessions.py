@@ -1,8 +1,9 @@
 from datetime import datetime
 import uuid
 import logging
-
 from flask_json import JsonError
+from .util import get_filters
+
 
 class Sessions(object):
 
@@ -64,16 +65,20 @@ class Sessions(object):
 
     def find(self, args):
         sessions = []
-        filters = ['sessions.ip = "129.240.239.173"']
-        if args.get('date'):
-            filters.append('sessions.started_at LIKE "{}%"'.format(args.get('date')))
+        filters, filterargs = get_filters(args)
+
         for row in self.db.select('''
-                SELECT sessions.id, sessions.started_at, sessions.stopped_at, COUNT(click_events.id) AS clicks
+                SELECT
+                    sessions.id,
+                    sessions.started_at,
+                    sessions.stopped_at,
+                    COUNT(click_events.id) AS clicks,
+                    MAX(click_events.time) AS last_action
                 FROM sessions
                 JOIN events as click_events ON sessions.id=click_events.session_id AND click_events.action="click"
-                WHERE {filters}
+                {}
                 GROUP BY sessions.id
-            '''.format(filters=' AND '.join(filters))):
+            '''.format(filters), filterargs):
             session = dict(zip(row.keys(), row))
             sessions.append(session)
 

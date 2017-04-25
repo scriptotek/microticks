@@ -27,8 +27,8 @@ class Database(object):
         self.conn.commit()
         return c
 
-    def select(self, query, *args):
-        return self.conn.execute(query, *args)
+    def select(self, query, args):
+        return self.conn.execute(query, args)
 
     def close(self):
         return self.conn.close()
