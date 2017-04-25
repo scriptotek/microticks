@@ -54,3 +54,33 @@ export MICROTICKS_KEY=my-secret-key
 ```
 gunicorn --workers 2 --bind 127.0.0.1:8001 wsgi
 ```
+
+### Apache config
+
+Note: [The Alias directive takes precedence over WSGIScriptAlias](https://serverfault.com/questions/59791/configure-apache-to-handle-a-sub-path-using-wsgi/59920#59920), so you cannot
+mount WSGI application under a URL specified by Alias directive.
+
+```
+<VirtualHost *:80>
+    DocumentRoot "/data/www/"
+
+    WSGIDaemonProcess microticks python-home=/data/microticks/api/ENV
+
+    Alias /microticks/api /data/microticks/api/wsgi.py
+    Alias /microticks /data/microticks/static
+    <Directory /data/microticks/api>
+        WSGIProcessGroup microticks
+        WSGIApplicationGroup %{GLOBAL}
+        AddHandler wsgi-script .py
+        Options ExecCGI
+        Require all granted
+    </Directory>
+
+    <Directory /data/microticks/static>
+        AllowOverride None
+        # Options Indexes FollowSymLinks
+        # Allow open access:
+        Require all granted
+    </Directory>
+</VirtualHost>
+```
