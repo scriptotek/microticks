@@ -5,6 +5,7 @@ import sys
 import os
 from functools import wraps
 import logging
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
 import yaml
@@ -126,11 +127,38 @@ def api_key_required(f):
 
 @app.route("/")
 def hello():
-    return '''
-    <pre>
+    now = datetime.now()
 
-    POST /sessions
+    return '''
+
+    <html><body style="background:#eee; padding: 1em 2em; font-family:sans-serif;">
+
+    <h1>Microticks</h1>
+
+    <h3>GET /sessions</h3>
+    <p>
+        Get sessions, optionally filtered by date and IP. Examples:
+    </p>
+    <ul>
+        <li>
+            <a href="/sessions?ip=129.240.239.173&date=%(today)s">/sessions?ip=129.240.239.173&date=%(today)s</a>
+        </li>
+    </ul>
+
+    <h3>GET /events</h3>
+    <p>
+        Get events, optionally filtered by date and IP. Examples:
+    </p>
+    <ul>
+        <li>
+            <a href="/events?ip=129.240.239.173&date=%(today)s">/events?ip=129.240.239.173&date=%(today)s</a>
+        </li>
+    </ul>
+    <h3>POST /sessions</h3>
+    <p>
         Start a new session and get a session token.
+    </p>
+    <pre>
 
         Form data:
             consumer_key: string
@@ -138,9 +166,13 @@ def hello():
 
         Returns:
             {'status': 200, 'token': string}
+    </pre>
 
-    POST /sessions/stop
-        Stop a session.
+    <h3>POST /sessions/stop</h3>
+
+    <p>Stop a session.</p>
+
+    <pre>
 
         Form data:
             token: string
@@ -149,9 +181,13 @@ def hello():
         Returns:
             {'status': 200}
 
-    POST /events
+    </pre>
 
-        Store a new event.
+    <h3>POST /events</h3>
+
+        <p>Store a new event.</p>
+
+    <pre>
 
         Form data:
             token: the session token
@@ -162,14 +198,11 @@ def hello():
         Returns:
             {'status': 200, 'event_id': int}
 
-    GET /sessions?ip=129.240.239.173&date=2017-03-16
+    </pre>
 
-        Get sessions, optionally filtered by date and IP.
+    </body></html>
 
-    GET /events?ip=129.240.239.173&date=2017-03-16
-
-        Get events, optionally filtered by date and IP.
-    '''
+    ''' % {'today': now.strftime('%F')}
 
 
 @app.route('/sessions', methods=['POST'])
