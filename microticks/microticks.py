@@ -141,7 +141,7 @@ def hello():
     </p>
     <ul>
         <li>
-            <a href="/sessions?ip=129.240.239.173&date=%(today)s">/sessions?ip=129.240.239.173&date=%(today)s</a>
+            <a href="./sessions?ip=129.240.239.173&date=%(today)s">/sessions?ip=129.240.239.173&date=%(today)s</a>
         </li>
     </ul>
 
@@ -151,7 +151,7 @@ def hello():
     </p>
     <ul>
         <li>
-            <a href="/events?ip=129.240.239.173&date=%(today)s">/events?ip=129.240.239.173&date=%(today)s</a>
+            <a href="./events?ip=129.240.239.173&date=%(today)s">/events?ip=129.240.239.173&date=%(today)s</a>
         </li>
     </ul>
     <h3>POST /sessions</h3>
