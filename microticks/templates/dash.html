@@ -1,0 +1,95 @@
+<html><head></head>
+<body style="background:#eee; padding: 1em 2em; font-family:sans-serif;">
+
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/vue-resource"></script>
+
+{% raw %}
+<div id="app">
+    <div v-for="sess in sessions">
+        <div v-if="sess.start">
+            Session #{{sess.id}} : started {{sess.start}} ( {{sess.startRel.h}} h {{sess.startRel.m}} m {{sess.startRel.s}} s ago)
+  <ul style="font-size: 12px;">
+    <li v-for="entry in sess.events">
+    +{{ entry.relTime }} secs: {{ entry.action }}
+    </li>
+  </ul>
+  </div>
+    </div>
+    Got {{ events.length }} records. <button v-on:click="fetchMore(offset)">Fetch more</button>
+</div>
+{% endraw %}
+
+<script>
+new Vue({
+  el: '#app',
+  data: function() {
+    return {
+      offset: 0,
+      sessions: [],
+      events: [],
+    };
+  },
+  methods: {
+    fetchMore: function(offset) {
+    this.$http.get('/microticks/api/events' + window.location.search + '&limit=100&offset=' + (offset ? offset : '0') + '&sort.desc=time')
+      .then(function(response) {
+          return response.json();
+      }.bind(this))
+      .then(function(json) {
+
+          json.events = json.events.map(function(x) {
+                x.time = new Date(x.time);
+                return x;
+              });
+
+          var existingIds = this.events.map(function(x) { return x.id; });
+          json.events.filter(function(evt) {
+              return existingIds.indexOf(evt.id) == -1;
+              }).forEach(function(evt) {
+                  this.events.push(evt);
+                  console.log('Got ' + this.events.length);
+                }.bind(this));
+          
+          var currentSession = null;
+          var sessions = [];
+          this.events.forEach(function(evt) {
+              if (!currentSession || currentSession.id != evt.session_id) {
+                if (currentSession) {
+                    currentSession.start = currentSession.events[currentSession.events.length-1].time;
+                    var diff = (new Date() - currentSession.start) / 1000 ;
+                    currentSession.startRel = {h: Math.floor(diff / 3600 )};
+                    currentSession.startRel.m = Math.floor(diff % 3600 / 60);
+                    currentSession.startRel.s = Math.floor(diff % 3600 % 60);
+                    currentSession.events = currentSession.events.map(function(x) {
+                        x.relTime = (x.time - currentSession.start) / 1000;
+                        return x;
+                    });
+                }
+                currentSession = {id: evt.session_id, events: [], start: 0};
+                
+                sessions.push(currentSession);
+              }
+              currentSession.events.push(evt);
+          }.bind(this));
+
+          this.sessions = sessions;
+
+        if (offset == undefined) {
+            setTimeout(function() {
+                this.fetchMore();
+            }.bind(this), 1000);
+        } else {
+            this.offset = offset + json.events.length;
+        }
+      }.bind(this));
+    }
+  },
+  mounted: function() {
+    this.fetchMore(0);
+  }
+});
+</script>
+
+</body>
+</html>

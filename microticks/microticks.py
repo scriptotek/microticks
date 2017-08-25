@@ -10,7 +10,7 @@ from logging.handlers import RotatingFileHandler
 
 import yaml
 import click
-from flask import Flask, g, request, redirect, url_for
+from flask import Flask, g, request, redirect, url_for, render_template
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 from flask_cors import CORS, cross_origin
 from flask_log import Logging
@@ -126,83 +126,17 @@ def api_key_required(f):
 # App routes
 
 @app.route("/")
+@api_key_required
 def hello():
     now = datetime.now()
+    return render_template('index.html', today=now.strftime('%F'))
 
-    return '''
 
-    <html><body style="background:#eee; padding: 1em 2em; font-family:sans-serif;">
-
-    <h1>Microticks</h1>
-
-    <h3>GET /sessions</h3>
-    <p>
-        Get sessions, optionally filtered by date and IP. Examples:
-    </p>
-    <ul>
-        <li>
-            <a href="./sessions?ip=129.240.239.173&date=%(today)s">/sessions?ip=129.240.239.173&date=%(today)s</a>
-        </li>
-    </ul>
-
-    <h3>GET /events</h3>
-    <p>
-        Get events, optionally filtered by date and IP. Examples:
-    </p>
-    <ul>
-        <li>
-            <a href="./events?ip=129.240.239.173&date=%(today)s">/events?ip=129.240.239.173&date=%(today)s</a>
-        </li>
-    </ul>
-    <h3>POST /sessions</h3>
-    <p>
-        Start a new session and get a session token.
-    </p>
-    <pre>
-
-        Form data:
-            consumer_key: string
-            ts: timestamp (2017-02-27T16:18:57.657Z)
-
-        Returns:
-            {'status': 200, 'token': string}
-    </pre>
-
-    <h3>POST /sessions/stop</h3>
-
-    <p>Stop a session.</p>
-
-    <pre>
-
-        Form data:
-            token: string
-            ts: timestamp (2017-02-27T16:18:57.657Z)
-
-        Returns:
-            {'status': 200}
-
-    </pre>
-
-    <h3>POST /events</h3>
-
-        <p>Store a new event.</p>
-
-    <pre>
-
-        Form data:
-            token: the session token
-            ts: timestamp (2017-02-27T16:18:57.657Z)
-            action: e.g. 'click_book',
-            data: 'book id or something else'
-
-        Returns:
-            {'status': 200, 'event_id': int}
-
-    </pre>
-
-    </body></html>
-
-    ''' % {'today': now.strftime('%F')}
+@app.route("/dash")
+@api_key_required
+def dash():
+    now = datetime.now()
+    return render_template('dash.html', today=now.strftime('%F'))
 
 
 @app.route('/sessions', methods=['POST'])
