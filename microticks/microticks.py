@@ -135,7 +135,6 @@ def api_key_required(f):
 # App routes
 
 @app.route("/")
-@api_key_required
 def hello():
     now = datetime.now()
     return render_template('index.html', today=now.strftime('%F'))
