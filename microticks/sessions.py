@@ -65,11 +65,12 @@ class Sessions(object):
 
     def find(self, args):
         sessions = []
-        filters, filterargs = get_filters(args)
+        filters, filterargs, limit = get_filters(args)
 
         for row in self.db.select('''
                 SELECT
                     sessions.id,
+                    sessions.consumer_id,
                     sessions.started_at,
                     sessions.stopped_at,
                     COUNT(click_events.id) AS clicks,
@@ -78,7 +79,8 @@ class Sessions(object):
                 JOIN events as click_events ON sessions.id=click_events.session_id AND click_events.action="click"
                 {}
                 GROUP BY sessions.id
-            '''.format(filters), filterargs):
+                {}
+            '''.format(filters, limit), filterargs):
             session = dict(zip(row.keys(), row))
             sessions.append(session)
 

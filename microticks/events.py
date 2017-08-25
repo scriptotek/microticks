@@ -49,13 +49,13 @@ class Events(object):
 
     def find(self, args):
         events = []
-        filters, filterargs = get_filters(args)
+        filters, filterargs, limit = get_filters(args)
 
         for row in self.db.select('''
             SELECT events.id, events.session_id, events.time, events.action, events.data FROM events
             LEFT JOIN sessions on sessions.id = events.session_id
-            {}
-            '''.format(filters), filterargs):
+            {} {}
+            '''.format(filters, limit), filterargs):
             row = dict(zip(row.keys(), row))
             try:
                 row['data'] = json.loads(row['data'])
