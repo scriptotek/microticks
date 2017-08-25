@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Microticks example</title>
+	<style>
+
+	body {
+		margin: 0;
+	}
+
+	#some_box {
+		background: #FF4136; font-weight: bold; padding: 3em; color: hsla(3, 100%, 25%, 1.0);
+	}
+	#some_other_box {
+		background: #FFDC00; font-weight: bold; padding: 3em; color: color:hsla(52, 100%, 20%, 1.0);
+	}
+
+	</style>
+</head>
+<body>
+
+	<div id="some_box">Some box</div>
+
+	<div id="some_other_box">Some other box</div>
+
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+	<script src="microticks.js"></script>
+	<script src="client.js"></script>
+	<script>
+
+	var mticks = new MicroticksClient(
+		MicroticksService.DUMMY_HOST,  // Replace with the hostname where the Microticks service is running
+		1  // The consumer key for this app
+	);
+	mticks.service.debug = true;  // Log messages to console
+
+	</script>
+</body>
+</html>
