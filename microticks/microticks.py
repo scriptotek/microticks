@@ -123,10 +123,10 @@ def api_key_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if app.config.get('MICROTICKS_KEY') is not None:
-            if request.form.get('key') is None:
+            if request.args.get('key') is None:
                 raise JsonError(description='Please specify an API key using the "key" query string parameter.', status=401)
-            elif request.form.get('key') != app.config.get('MICROTICKS_KEY'):
-                raise JsonError(description='The key is not valid: .' + request.form.get('key'), status=401)
+            elif request.args.get('key') != app.config.get('MICROTICKS_KEY'):
+                raise JsonError(description='The key does not seem to be the right one.', status=401)
         return f(*args, **kwargs)
     return decorated_function
 
@@ -165,6 +165,7 @@ def stop_session():
 
 
 @app.route('/sessions', methods=['GET'])
+@api_key_required
 def get_sessions():
     # validate_consumer_key()
     sessions = get_db().sessions.find(request.args)
@@ -182,6 +183,7 @@ def store_event():
     return json_response(event_id=event_id)
 
 @app.route('/events', methods=['GET'])
+@api_key_required
 def get_events():
     # validate_consumer_key()
     events = get_db().events.find(request.args)
